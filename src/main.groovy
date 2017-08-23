@@ -120,21 +120,24 @@ float rtri = 0
 // Run the rendering loop until the user has attempted to close
 // the window or has pressed the ESCAPE key.
 while (!glfwWindowShouldClose(window)) {
+
+    // Viewport
     glViewport(0, 0, (int) width, (int) height);
 
-
-    m.setPerspective((float) Math.toRadians(40.0f), (float) (width / height), 0.01f, 10000.0f);
+    // Perspective
+    m.setPerspective((float) Math.toRadians(75.0f), (float) (width / height), 0.01f, 10000.0f);
     glMatrixMode(GL_PROJECTION);
-//    glLoadIdentity();
     glLoadMatrixf(m.get(fb));
 
+    // Camera position
     m.setLookAt(4.0f, 5.5f, 18.0f,
             0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f);
     glMatrixMode(GL_MODELVIEW);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
     glLoadMatrixf(m.get(fb));
+
+    // Drawing
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
     for (int i = -10; i < 50; i++) {
         glPushMatrix()
@@ -144,7 +147,7 @@ while (!glfwWindowShouldClose(window)) {
         if (i == 0) {
             glRotatef(rtri, 0.0f, 1.0f, 0.0f);
         }
-        
+
         glBegin(GL_TRIANGLES);
 
         glColor3f(1.0f, 0.0f, 0.0f);          // Red
