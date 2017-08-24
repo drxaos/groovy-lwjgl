@@ -49,7 +49,8 @@ GLFWErrorCallback.createPrint(System.err).set()
 if (!glfwInit())
     throw new IllegalStateException("Unable to initialize GLFW")
 
-
+glfwWindowHint(GLFW_STENCIL_BITS, 8);
+glfwWindowHint(GLFW_SAMPLES, 8);
 glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
 glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
@@ -117,15 +118,26 @@ Matrix4f m = new Matrix4f();
 
 float rtri = 0
 
+double lastTime = glfwGetTime();
+int nbFrames = 0;
+
 // Run the rendering loop until the user has attempted to close
 // the window or has pressed the ESCAPE key.
 while (!glfwWindowShouldClose(window)) {
+
+    double currentTime = glfwGetTime();
+    nbFrames++;
+    if (currentTime - lastTime >= 1.0) {
+        println("FPS: " + (1f * nbFrames / (currentTime - lastTime)))
+        nbFrames = 0;
+        lastTime += 1.0;
+    }
 
     // Viewport
     glViewport(0, 0, (int) width, (int) height);
 
     // Perspective
-    m.setPerspective((float) Math.toRadians(75.0f), (float) (width / height), 0.01f, 10000.0f);
+    m.setPerspective((float) Math.toRadians(100f), (float) (width / height), 0.01f, 10000.0f);
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(m.get(fb));
 
@@ -150,33 +162,44 @@ while (!glfwWindowShouldClose(window)) {
 
         glBegin(GL_TRIANGLES);
 
-        glColor3f(1.0f, 0.0f, 0.0f);          // Red
-        glVertex3f(0.0f, 1.0f, 0.0f);          // Top Of Triangle (Front)
-        glColor3f(0.0f, 1.0f, 0.0f);          // Green
-        glVertex3f(-1.0f, -1.0f, 1.0f);          // Left Of Triangle (Front)
-        glColor3f(0.0f, 0.0f, 1.0f);          // Blue
-        glVertex3f(1.0f, -1.0f, 1.0f);          // Right Of Triangle (Front)
+        float[] red = [1.0f, 0.0f, 0.0f]
+        float[] green = [0.0f, 1.0f, 0.0f]
+        float[] blue = [0.0f, 0.0f, 1.0f]
 
-        glColor3f(1.0f, 0.0f, 0.0f);          // Red
-        glVertex3f(0.0f, 1.0f, 0.0f);          // Top Of Triangle (Right)
-        glColor3f(0.0f, 0.0f, 1.0f);          // Blue
-        glVertex3f(1.0f, -1.0f, 1.0f);          // Left Of Triangle (Right)
-        glColor3f(0.0f, 1.0f, 0.0f);          // Green
-        glVertex3f(1.0f, -1.0f, -1.0f);         // Right Of Triangle (Right)
+        float[] top = [0.0f, 1.0f, 0.0f]
+        float[] frontLeft = [-1.0f, -1.0f, 1.0f]
+        float[] frontRight = [1.0f, -1.0f, 1.0f]
+        float[] backLeft = [-1.0f, -1.0f, -1.0f]
+        float[] backRight = [1.0f, -1.0f, -1.0f]
 
-        glColor3f(1.0f, 0.0f, 0.0f);          // Red
-        glVertex3f(0.0f, 1.0f, 0.0f);          // Top Of Triangle (Back)
-        glColor3f(0.0f, 1.0f, 0.0f);          // Green
-        glVertex3f(1.0f, -1.0f, -1.0f);         // Left Of Triangle (Back)
-        glColor3f(0.0f, 0.0f, 1.0f);          // Blue
-        glVertex3f(-1.0f, -1.0f, -1.0f);         // Right Of Triangle (Back)
 
-        glColor3f(1.0f, 0.0f, 0.0f);          // Red
-        glVertex3f(0.0f, 1.0f, 0.0f);          // Top Of Triangle (Left)
-        glColor3f(0.0f, 0.0f, 1.0f);          // Blue
-        glVertex3f(-1.0f, -1.0f, -1.0f);          // Left Of Triangle (Left)
-        glColor3f(0.0f, 1.0f, 0.0f);          // Green
-        glVertex3f(-1.0f, -1.0f, 1.0f);          // Right Of Triangle (Left)
+        glColor3fv(red)
+        glVertex3fv(top)
+        glColor3fv(green)
+        glVertex3fv(frontLeft)
+        glColor3fv(blue)
+        glVertex3fv(frontRight)
+
+        glColor3fv(red)
+        glVertex3fv(top)
+        glColor3fv(blue)
+        glVertex3fv(frontRight)
+        glColor3fv(green)
+        glVertex3fv(backRight)
+
+        glColor3fv(red)
+        glVertex3fv(top)
+        glColor3fv(green)
+        glVertex3fv(backRight)
+        glColor3fv(blue)
+        glVertex3fv(backLeft)
+
+        glColor3fv(red)
+        glVertex3fv(top)
+        glColor3fv(blue)
+        glVertex3fv(backLeft)
+        glColor3fv(green)
+        glVertex3fv(frontLeft)
 
         glEnd();                        // Done Drawing The Pyramid
 
